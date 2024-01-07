@@ -3,7 +3,9 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 import SignInWithGoogle from './components/SignInWithGoogle';
 import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
-
+import Link from 'next/link';
+import '../../styling/Home.Modules.css';
+import Particle from './components/Particle';
 const Home = () => {
   const [user, setUser] = useState(null);
 
@@ -34,15 +36,21 @@ const Home = () => {
     }
   };
 
+  const handleSignIn = (userData) => {
+    setUser(userData);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <SignInWithGoogle onSignIn={setUser} />
-        {user && (
-          <button onClick={addCoolData}>Add Cool Data</button>
-        )}
-      </div>
+    <header>
+      <title>Uranym</title>
+    <main className="flex min-h-screen flex-col ">
+        <div className='midDiv'>
+          <Particle></Particle>
+          <h1 className='bigTextTitle'>Uranym</h1>
+          <SignInWithGoogle onSignIn={handleSignIn} />
+        </div>
     </main>
+    </header>
   );
 };
 

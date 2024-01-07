@@ -1,4 +1,3 @@
-'use client'
 import React, { useState, useEffect } from 'react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth } from '../../../firebase';
@@ -29,6 +28,8 @@ const SignInWithGoogle = ({ onSignIn }) => {
       // Pass the user information to the parent component
       onSignIn(user);
 
+      // Redirect to UserHome page
+      window.location.href = '/UserHome'
     } catch (error) {
       // Handle errors if needed
       const errorCode = error.code;
@@ -39,7 +40,7 @@ const SignInWithGoogle = ({ onSignIn }) => {
 
   return (
     <div>
-      <button onClick={handleSignInWithGoogle}>Sign in with Google</button>
+      <button onClick={handleSignInWithGoogle} className='bigText'>Sign in with Google</button>
       {userCredential && (
         <div>
           {/* Additional JSX goes here */}
