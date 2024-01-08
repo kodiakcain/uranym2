@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth } from '../../../firebase';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { GoogleAuthProvider } from 'firebase/auth';
 
 const SignInWithGoogle = ({ onSignIn }) => {
+  const db = getFirestore();
   const [userCredential, setUserCredential] = useState(null);
 
   useEffect(() => {
@@ -12,30 +13,45 @@ const SignInWithGoogle = ({ onSignIn }) => {
   }, []);
 
   const handleSignInWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, new GoogleAuthProvider());
-      const user = result.user;
-      setUserCredential(result);
+    const collectionRef = await getDocs(collection(db, 'users'));
+    let totalUsers = 0;
+    collectionRef.forEach((doc) => {
+      totalUsers++;
+    })
 
-      // Store user information in Firestore
-      const firestore = getFirestore();
-      const userRef = doc(firestore, 'users', user.uid);
-      await setDoc(userRef, {
-        email: user.email,
-        uid: user.uid,
-      });
+    console.log(totalUsers);
 
-      // Pass the user information to the parent component
-      onSignIn(user);
-
-      // Redirect to UserHome page
-      window.location.href = '/UserHome'
-    } catch (error) {
-      // Handle errors if needed
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.error(errorCode, errorMessage);
+    if (totalUsers <= 20) {
+      try {
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        const user = result.user;
+        setUserCredential(result);
+  
+        // Store user information in Firestore
+        const firestore = getFirestore();
+        const userRef = doc(firestore, 'users', user.uid);
+        await setDoc(userRef, {
+          email: user.email,
+          uid: user.uid,
+        });
+  
+        // Pass the user information to the parent component
+        onSignIn(user);
+  
+        // Redirect to UserHome page
+        window.location.href = '/UserHome'
+      } catch (error) {
+        // Handle errors if needed
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error(errorCode, errorMessage);
+      }
+    } else {
+      console.log('max users');
+      alert('Maximum number of users for site reached. Cannot sign in.');
     }
+
+    
   };
 
   return (
