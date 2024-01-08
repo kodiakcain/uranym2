@@ -6,38 +6,24 @@ import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import '../../styling/Home.Modules.css';
 import Particle from './components/Particle';
+import { motion } from 'framer-motion';
+
 const Home = () => {
   const [user, setUser] = useState(null);
 
-  const addCoolData = async () => {
-    if (!user) {
-      // User not authenticated
-      return;
-    }
-
-    const db = getFirestore();
-    const userUid = user.uid;
-
-    try {
-      // Create a reference to the user's 'cooldata' subcollection
-      const coolDataCollectionRef = collection(db, 'users', userUid, 'cooldata');
-
-      // Add or update the document within the 'cooldata' subcollection
-      const coolDataDocRef = doc(coolDataCollectionRef, 'coolDataDocument');
-      await setDoc(coolDataDocRef, {
-        // Add your cool data here, for example:
-        coolField: 'Cool value',
-        // Add other fields as needed
-      });
-
-      console.log('Cool data added for UID: ', userUid);
-    } catch (e) {
-      console.error('Error adding cool data: ', e);
-    }
-  };
-
   const handleSignIn = (userData) => {
     setUser(userData);
+  };
+
+  const buttonVariants = {
+    rest: {
+      scale: 1,
+      boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.1)',
+    },
+    hover: {
+      scale: 1.1,
+      boxShadow: '0px 0px 16px rgba(0, 0, 0, 0.2)',
+    },
   };
 
   return (
@@ -47,7 +33,13 @@ const Home = () => {
         <div className='midDiv'>
           <Particle></Particle>
           <h1 className='bigTextTitle'>Uranym</h1>
-          <SignInWithGoogle onSignIn={handleSignIn} />
+          <motion.button
+        variants={buttonVariants}
+        whileHover="hover"
+        whileTap="rest"
+        >
+        <SignInWithGoogle onSignIn={handleSignIn} />
+        </motion.button>
         </div>
     </main>
     </header>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase'; // Adjust the path accordingly
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, addDoc, collection } from 'firebase/firestore';
 import '../styling/UserHome.Modules.css';
 import Link from 'next/link';
 
@@ -32,15 +32,31 @@ const UserHome = () => {
     const db = getFirestore();
     if (user) {
       const userDocRef = doc(db, 'users', user.uid);
-
+      
       try {
-        await setDoc(userDocRef, { data: 'urahgoauhgar' });
+        await setDoc(userDocRef, { data: 'urahgar' });
         console.log('Document written with ID: ', userDocRef.id);
       } catch (error) {
         console.error('Error writing document:', error.message);
       }
     }
   };
+
+  const handleFirestoreInteraction2 = async () => {
+  const db = getFirestore();
+  if (user) {
+    const userDocRef2 = doc(db, 'users', user.uid);
+
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'data'), {
+        rand: "hi",
+      });
+      console.log('Document written with ID: ', userDocRef2.id);
+    } catch (error) {
+      console.error('Error writing document:', error.message);
+    }
+  }
+};
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -56,6 +72,9 @@ const UserHome = () => {
         )}
         <button onClick={handleFirestoreInteraction} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
           Firestore Interaction
+        </button>
+        <button onClick={handleFirestoreInteraction2} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Firestore Interaction 2
         </button>
       </div>
       <p>HOME</p>
