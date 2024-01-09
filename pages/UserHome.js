@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
+import TextField from '@mui/material/TextField';
 
 const UserHome = () => {
 
@@ -75,7 +76,7 @@ const handleTextboxChange = (e) => {
 const handleTextboxSubmit = async () => {
 
   //Task cannot exceed 200 characters.
-  if (newData.length > 10 ) {
+  if (newData.length > 200 ) {
     setMaxTextAlert(true);
     return;
   }
@@ -206,13 +207,9 @@ const handleTextboxSubmit = async () => {
       </Collapse>}
       </div>
       <div className='textBox'>
-      <input
-          type="text"
-          value={newData}
-          onChange={handleTextboxChange}
-          placeholder="Enter Task"
-          className="p-2 m-2 border border-gray-300 inputWidth"
-        />
+      
+        <TextField id="outlined-basic" label="Enter Task" variant="outlined" color='secondary' value={newData}
+          onChange={handleTextboxChange} />
       </div>
       <div className='submitDiv'>
       <button
