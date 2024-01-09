@@ -7,14 +7,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Exo 2:wght@500&display=swap');
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255,255,255; /* Purple start */
+  --background-start-rgb: 255,255,255; /* White start */
   --background-end-rgb: 0, 0, 0; /* Black */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 51, 0, 102; /* Dark purple start */
+    --background-start-rgb: 255, 255, 255; /* White start */
     --background-end-rgb: 0, 0, 0; /* Black */
   }
 }
