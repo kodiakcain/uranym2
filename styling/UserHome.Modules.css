@@ -20,7 +20,7 @@
 }
 
 body {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Exo 2', sans-serif;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
     to bottom,
@@ -31,7 +31,7 @@ body {
 
 .dataBorder {
   font-size: 10px;
-  font-family: 'Exo 2';
+  font-family: 'Exo 2', sans-serif;
   border-color: black;
   border-radius: 2px;
   border-width: 2px;
@@ -43,4 +43,62 @@ body {
 .dataDiv {
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.logoutBorder {
+  font-size: 10px;
+  font-family: 'Exo 2', sans-serif;
+  border-color: black;
+  border-radius: 2px;
+  border-width: 2px;
+  padding: 10px;
+  border-style: solid;
+  width: fit-content;
+  
+}
+
+.logoutDiv, .tasksBorder {
+  justify-content: center;
+  display: flex;
+  padding-top: 20px;
+}
+
+.tasksText {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 30px;
+}
+
+.mainDiv {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.inputWidth {
+  width: 100px;
+}
+
+.textBox {
+  display: flex;
+  justify-content: center;
+}
+
+.submitButton {
+  font-size: 10px;
+  font-family: 'Exo 2', sans-serif;
+  border-color: black;
+  border-radius: 2px;
+  border-width: 2px;
+  padding: 10px;
+  border-style: solid;
+  width: fit-content;
+}
+
+.submitDiv {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
 }

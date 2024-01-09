@@ -69,6 +69,7 @@ const SignInWithGoogle = ({ onSignIn }) => {
         console.error(errorCode, errorMessage);
       }
     } else {
+      setOpen(true);
       setAlert(true);
     }
 
