@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase'; // Adjust the path accordingly
 import { getFirestore, doc, setDoc, addDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
@@ -57,6 +58,18 @@ const UserHome = () => {
     // Fetch data when the component mounts or when the user changes
     fetchDataFromFirestore();
   }, [user]);
+
+  //Button Hover
+  const buttonVariants = {
+    rest: {
+      scale: 1,
+      boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.1)',
+    },
+    hover: {
+      scale: 1.1,
+      boxShadow: '0px 0px 16px rgba(0, 0, 0, 0.2)',
+    },
+  };
 
   //Logout functionality
   const handleLogout = async () => {
@@ -125,7 +138,12 @@ const handleTextboxSubmit = async () => {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="mainDiv">
         <div className='logoutDiv'>
-        {user ? (
+        <motion.button
+        variants={buttonVariants}
+        whileHover="hover"
+        whileTap="rest"
+        >
+          {user ? (
           <Link href='/'>
             <button onClick={handleLogout} className='logoutBorder'>
             Logout
@@ -134,6 +152,7 @@ const handleTextboxSubmit = async () => {
         ) : (
           <p>User not logged in</p>
         )}
+        </motion.button>
         </div>
         {maxUserAlert && <Collapse in={open}>
         <Alert
@@ -212,12 +231,18 @@ const handleTextboxSubmit = async () => {
           onChange={handleTextboxChange} />
       </div>
       <div className='submitDiv'>
-      <button
+      <motion.button
+        variants={buttonVariants}
+        whileHover="hover"
+        whileTap="rest"
+        >
+          <button
           onClick={handleTextboxSubmit}
           className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded submitButton"
         >
           Submit Data
         </button>
+        </motion.button>
       </div>
       </div>
     </main>
