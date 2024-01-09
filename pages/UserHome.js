@@ -100,7 +100,7 @@ const UserHome = () => {
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         {user ? (
           <Link href='/'>
-<button onClick={handleLogout} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <button onClick={handleLogout} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Logout
           </button>
           </Link>
@@ -113,13 +113,11 @@ const UserHome = () => {
         <button onClick={handleFirestoreInteraction2} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
           Firestore Interaction 2
         </button>
-        <div>
         <h2>User Data:</h2>
-        <ul>
-          {userData.map((data, index) => (
-            <li key={index}>{data.rand}</li>
+        <div className='dataDiv'>
+        {userData.map((data, index) => (
+              <p key={index} className='dataBorder'>{data.rand}</p>
           ))}
-        </ul>
       </div>
       </div>
       <p>HOME</p>

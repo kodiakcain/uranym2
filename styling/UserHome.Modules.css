@@ -28,3 +28,19 @@ body {
     rgb(var(--background-end-rgb))
   );  
 }
+
+.dataBorder {
+  font-size: 10px;
+  font-family: 'Exo 2';
+  border-color: black;
+  border-radius: 2px;
+  border-width: 2px;
+  padding: 30px;
+  border-style: solid;
+  width: fit-content;
+}
+
+.dataDiv {
+  display: flex;
+  flex-direction: row;
+}
