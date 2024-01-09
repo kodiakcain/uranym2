@@ -15,17 +15,6 @@ const Home = () => {
     setUser(userData);
   };
 
-  const buttonVariants = {
-    rest: {
-      scale: 1,
-      boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.1)',
-    },
-    hover: {
-      scale: 1.1,
-      boxShadow: '0px 0px 16px rgba(0, 0, 0, 0.2)',
-    },
-  };
-
   return (
     <header>
       <title>Uranym</title>
@@ -33,13 +22,9 @@ const Home = () => {
         <div className='midDiv'>
           <Particle></Particle>
           <h1 className='bigTextTitle'>Uranym</h1>
-          <motion.button
-        variants={buttonVariants}
-        whileHover="hover"
-        whileTap="rest"
-        >
+          <h2 className='bigTextTitle'>Task Management</h2>
         <SignInWithGoogle onSignIn={handleSignIn} />
-        </motion.button>
+      
         </div>
     </main>
     </header>
