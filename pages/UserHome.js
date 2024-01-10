@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase'; // Adjust the path accordingly
-import { getFirestore, doc, setDoc, addDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, addDoc, collection, getDocs, onSnapshot, deleteDoc } from 'firebase/firestore';
 import '../styling/UserHome.Modules.css';
 import Link from 'next/link';
 import Alert from '@mui/material/Alert';
@@ -11,6 +11,7 @@ import Collapse from '@mui/material/Collapse';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
+import { FaTrash } from "react-icons/fa";
 
 const UserHome = () => {
 
@@ -134,6 +135,22 @@ const handleTextboxSubmit = async () => {
   }
 };
 
+const handleDelete = async (index) => {
+  const db = getFirestore();
+
+  try {
+    const userDocRef = collection(db, 'users', user.uid, 'data');
+    const snapshot = await getDocs(userDocRef);
+    const docToDelete = snapshot.docs[index];
+
+    if (docToDelete) {
+      await deleteDoc(doc(userDocRef, docToDelete.id));
+    }
+  } catch (error) {
+    console.error('Error deleting document:', error.message);
+  }
+};
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="mainDiv">
@@ -180,7 +197,12 @@ const handleTextboxSubmit = async () => {
         
         <div className='dataDiv'>
         {userData.map((data, index) => (
-              <p key={index} className='dataBorder'>{data.rand}</p>
+          <div className='dataBorder'>
+            <p key={index} >{data.rand}</p>
+            <IconButton onClick={() => handleDelete(index)}>
+              <FaTrash />
+            </IconButton>
+          </div>
           ))}
       </div>
       <div>
@@ -240,7 +262,7 @@ const handleTextboxSubmit = async () => {
           onClick={handleTextboxSubmit}
           className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded submitButton"
         >
-          Submit Data
+          Submit Tasks
         </button>
         </motion.button>
       </div>
