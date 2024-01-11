@@ -1,13 +1,11 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-
-@import url('https://fonts.googleapis.com/css2?family=Exo 2:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Exo 2:wght@500&display=swap");
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255,255,255; /* White start */
+  --background-start-rgb: 255, 255, 255; /* White start */
   --background-end-rgb: 0, 0, 0; /* Black */
 }
 
@@ -20,24 +18,28 @@
 }
 
 body {
-  font-family: 'Exo 2', sans-serif;
+  font-family: "Exo 2", sans-serif;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
     to bottom,
     rgb(var(--background-start-rgb)),
     rgb(var(--background-end-rgb))
-  );  
+  );
 }
 
 .dataBorder {
   font-size: 10px;
-  font-family: 'Exo 2', sans-serif;
+  font-family: "Exo 2", sans-serif;
   border-color: black;
   border-radius: 2px;
   border-width: 2px;
   padding: 30px;
   border-style: solid;
   width: fit-content;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  
 }
 
 .dataDiv {
@@ -50,24 +52,24 @@ body {
 
 .logoutBorder {
   font-size: 10px;
-  font-family: 'Exo 2', sans-serif;
+  font-family: "Exo 2", sans-serif;
   border-color: black;
   border-radius: 2px;
   border-width: 2px;
   padding: 10px;
   border-style: solid;
   width: fit-content;
-  
 }
 
-.logoutDiv, .tasksBorder {
+.logoutDiv,
+.tasksBorder {
   justify-content: center;
   display: flex;
   padding-top: 20px;
 }
 
 .tasksText {
-  font-family: 'Exo 2', sans-serif;
+  font-family: "Exo 2", sans-serif;
   font-size: 30px;
 }
 
@@ -88,7 +90,7 @@ body {
 
 .submitButton {
   font-size: 10px;
-  font-family: 'Exo 2', sans-serif;
+  font-family: "Exo 2", sans-serif;
   border-color: black;
   border-radius: 2px;
   border-width: 2px;
@@ -101,4 +103,8 @@ body {
   display: flex;
   justify-content: center;
   padding-top: 10px;
+}
+
+.dataSize {
+  font-size: 15px;
 }
