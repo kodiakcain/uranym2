@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { auth } from "../firebase";
 import {
   getFirestore,
@@ -8,7 +8,7 @@ import {
   onSnapshot,
   deleteDoc,
   updateDoc,
-  doc
+  doc,
 } from "firebase/firestore";
 import "../styling/UserHome.Modules.css";
 import Link from "next/link";
@@ -33,6 +33,11 @@ const UserHome = () => {
   const [editData, setEditData] = useState("");
   const [maxEditData, setMaxEditData] = useState(false);
   const [editAlertOpen, setEditAlertOpen] = React.useState(true);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedPriority, setSelectedPriority] = useState("");
+  const [priorityAlert, setPriorityAlert] = useState(false);
+
+  
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -64,7 +69,7 @@ const UserHome = () => {
   }, [user]);
 
   useEffect(() => {
-    console.log('use effect');
+    console.log("use effect");
   }, [lessTextAlert]);
 
   const buttonVariants = {
@@ -93,22 +98,21 @@ const UserHome = () => {
 
   const handleEditTaskChange = (e, index) => {
     setEditData(e.target.value);
-  }
+  };
 
   const handleEditSubmit = async (index) => {
-
     if (editData.length > 200) {
       setEditAlertOpen(true);
       setMaxEditData(true);
       return;
     }
     const db = getFirestore();
-  
+
     try {
       const userDocRef = collection(db, "users", user.uid, "data");
       const snapshot = await getDocs(userDocRef);
       const docToUpdate = snapshot.docs[index];
-  
+
       if (docToUpdate) {
         await updateDoc(doc(userDocRef, docToUpdate.id), {
           rand: editData,
@@ -120,6 +124,11 @@ const UserHome = () => {
   };
 
   const handleTextboxSubmit = async () => {
+
+    if (selectedPriority == '') {
+      setPriorityAlert(true);
+      return;
+    }
     if (newData.length > 200) {
       setMaxTextAlert(true);
       return;
@@ -150,6 +159,8 @@ const UserHome = () => {
       try {
         await addDoc(collection(db, "users", user.uid, "data"), {
           rand: newData,
+          date: selectedDate,
+          priority: selectedPriority,
         });
         console.log("Document written with ID");
         setNewData("");
@@ -157,6 +168,9 @@ const UserHome = () => {
         console.error("Error writing document:", error.message);
       }
     }
+
+    setSelectedDate('');
+    setSelectedPriority('');
   };
 
   const handleDelete = async (index) => {
@@ -177,11 +191,11 @@ const UserHome = () => {
 
   const handleEdit = (index) => {
     setEditIndex(index);
-  }
+  };
 
   const closeEdit = () => {
     setEditIndex(null);
-  }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -204,7 +218,7 @@ const UserHome = () => {
           </motion.button>
         </div>
         {maxUserAlert && (
-          <Collapse in={editOpen}>
+          <Collapse in={maxUserAlert}>
             <Alert
               severity="error"
               action={
@@ -213,7 +227,7 @@ const UserHome = () => {
                   color="inherit"
                   size="small"
                   onClick={() => {
-                    setEditOpen(false);
+                    setAlert(false); // Update the state that controls the alert
                   }}
                 >
                   <CloseIcon fontSize="inherit" />
@@ -231,66 +245,81 @@ const UserHome = () => {
 
         <div className="dataDiv">
           {userData.map((data, index) => (
-            <div className="dataBorder" style={{overflow: 'hidden'}}>
-              <p key={index} className="dataSize">{data.rand}</p>
+            <div className="dataBorder" style={{ overflow: "hidden" }}>
+              <p key={index} className="dataSize">
+                {data.rand}
+              </p>
+              { data.date != '' && <p>Due: {data.date}</p>}
+              <p>Priority: {data.priority}</p>
               <motion.button
                 variants={buttonVariants}
                 whileHover="hover"
                 whileTap="rest"
               >
-                  <IconButton onClick={() => handleDelete(index)}>
-                    <FaTrash />
-                  </IconButton>
+                <IconButton onClick={() => handleDelete(index)}>
+                  <FaTrash />
+                </IconButton>
               </motion.button>
-              
+
               <motion.button
                 variants={buttonVariants}
                 whileHover="hover"
                 whileTap="rest"
               >
-              <button className='submitButton' onClick={() => handleEdit(index)}>
-                edit
-              </button>
+                <button
+                  className="submitButton"
+                  onClick={() => handleEdit(index)}
+                >
+                  edit
+                </button>
               </motion.button>
               {editIndex === index && (
                 <>
-                  <button className="submitButton" style={{ paddingTop: '10px' }} onClick={closeEdit}>
+                  <button
+                    className="submitButton"
+                    style={{ paddingTop: "10px" }}
+                    onClick={closeEdit}
+                  >
                     Close edit menu
                   </button>
                   <div>
                     {maxEditData && (
-                  <Collapse in={editAlertOpen}>
-                    <Alert
-                      severity="error"
-                      action={
-                        <IconButton
-                          aria-label="close"
-                          color="inherit"
-                          size="small"
-                          onClick={() => {
-                            setEditAlertOpen(false);
-                          }}
+                      <Collapse in={editAlertOpen}>
+                        <Alert
+                          severity="error"
+                          action={
+                            <IconButton
+                              aria-label="close"
+                              color="inherit"
+                              size="small"
+                              onClick={() => {
+                                setEditAlertOpen(false);
+                              }}
+                            >
+                              <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                          }
+                          sx={{ mb: 2 }}
                         >
-                          <CloseIcon fontSize="inherit" />
-                        </IconButton>
-                      }
-                      sx={{ mb: 2 }}
-                    >
-                      Maximum of 200 characters.
-                    </Alert>
-                  </Collapse>)}
+                          Maximum of 200 characters.
+                        </Alert>
+                      </Collapse>
+                    )}
                   </div>
                   <TextField
                     id="outlined-basic"
                     label="Enter Updated Task"
                     variant="outlined"
                     color="secondary"
-                    style={{ paddingTop: '10px' }}
+                    style={{ paddingTop: "10px" }}
                     value={editData}
                     onChange={(e) => handleEditTaskChange(e, index)}
                   />
-                  
-                  <button className="submitButton" onClick={() => handleEditSubmit(index)}>
+
+                  <button
+                    className="submitButton"
+                    onClick={() => handleEditSubmit(index)}
+                  >
                     Set Updated task
                   </button>
                 </>
@@ -343,6 +372,28 @@ const UserHome = () => {
               </Alert>
             </Collapse>
           )}
+          {priorityAlert && (
+            <Collapse in={open}>
+              <Alert
+                severity="error"
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                      setPriorityAlert(false);
+                    }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+                sx={{ mb: 2 }}
+              >
+                Must select priority for task.
+              </Alert>
+            </Collapse>
+          )}
         </div>
         <div className="textBox">
           <TextField
@@ -355,6 +406,33 @@ const UserHome = () => {
           />
         </div>
         <div className="submitDiv">
+          <p>
+            <u>priority</u>
+          </p>
+        </div>
+        <div className="submitDiv">
+          <select onChange={(e) => setSelectedPriority(e.target.value)} value={selectedPriority}>
+            <option value="">Select Priority</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div className="submitDiv">
+          <label for="datepicker">
+            <u>Select a due date:</u>
+          </label>
+        </div>
+        <div className="submitDiv">
+          <input
+            type="date"
+            id="datepicker"
+            name="datepicker"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+        </div>
+        <div className="submitDiv">
           <motion.button
             variants={buttonVariants}
             whileHover="hover"
@@ -364,10 +442,10 @@ const UserHome = () => {
               onClick={handleTextboxSubmit}
               className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded submitButton"
             >
-              Submit Tasks
+              Submit Task
             </button>
           </motion.button>
-          </div>
+        </div>
       </div>
     </main>
   );
