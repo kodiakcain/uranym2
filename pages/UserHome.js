@@ -29,15 +29,17 @@ const UserHome = () => {
   const [open, setOpen] = React.useState(true);
   const [maxTextAlert, setMaxTextAlert] = useState(false);
   const [lessTextAlert, setLessTextAlert] = useState(false);
-  const [editIndex, setEditIndex] = useState(null); // New state variable
+  const [editIndex, setEditIndex] = useState(null); 
+  const [editPriority, setEditPriority] = useState(null);
   const [editData, setEditData] = useState("");
   const [maxEditData, setMaxEditData] = useState(false);
   const [editAlertOpen, setEditAlertOpen] = React.useState(true);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedPriority, setSelectedPriority] = useState("");
   const [priorityAlert, setPriorityAlert] = useState(false);
+  const [userDataMedium, setUserDataMedium] = useState([]);
+  const [userDataLow, setUserDataLow] = useState([]);
 
-  
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -52,13 +54,29 @@ const UserHome = () => {
       const db = getFirestore();
       if (user) {
         try {
-          const userDocRef3 = collection(db, "users", user.uid, "data");
-          const unsubscribe = onSnapshot(userDocRef3, (snapshot) => {
+          const userDocRef3 = collection(db, "users", user.uid, "highData");
+          const unsubscribeHigh = onSnapshot(userDocRef3, (snapshot) => {
             const updatedData = snapshot.docs.map((doc) => doc.data());
             setUserData(updatedData);
           });
 
-          return () => unsubscribe();
+          const userDocRef5 = collection(db, "users", user.uid, "mediumData");
+          const unsubscribeMedium = onSnapshot(userDocRef5, (snapshot) => {
+            const updatedDataMedium = snapshot.docs.map((doc) => doc.data());
+            setUserDataMedium(updatedDataMedium);
+          });
+
+          const userDocRef6 = collection(db, "users", user.uid, "lowData");
+          const unsubscribeLow = onSnapshot(userDocRef6, (snapshot) => {
+            const updatedDataLow = snapshot.docs.map((doc) => doc.data());
+            setUserDataLow(updatedDataLow);
+          });
+
+          return () => {
+            unsubscribeHigh();
+            unsubscribeMedium();
+            unsubscribeLow();
+          };
         } catch (error) {
           console.error("Error fetching data from Firestore:", error.message);
         }
@@ -67,10 +85,6 @@ const UserHome = () => {
 
     fetchDataFromFirestore();
   }, [user]);
-
-  useEffect(() => {
-    console.log("use effect");
-  }, [lessTextAlert]);
 
   const buttonVariants = {
     rest: {
@@ -100,7 +114,7 @@ const UserHome = () => {
     setEditData(e.target.value);
   };
 
-  const handleEditSubmit = async (index) => {
+  const handleEditSubmit = async (index, priority) => {
     if (editData.length > 200) {
       setEditAlertOpen(true);
       setMaxEditData(true);
@@ -108,24 +122,56 @@ const UserHome = () => {
     }
     const db = getFirestore();
 
-    try {
-      const userDocRef = collection(db, "users", user.uid, "data");
-      const snapshot = await getDocs(userDocRef);
-      const docToUpdate = snapshot.docs[index];
-
-      if (docToUpdate) {
-        await updateDoc(doc(userDocRef, docToUpdate.id), {
-          rand: editData,
-        });
+    if (priority == 'low') {
+      try {
+        const userDocRef = collection(db, "users", user.uid, "lowData");
+        const snapshot = await getDocs(userDocRef);
+        const docToUpdate = snapshot.docs[index];
+  
+        if (docToUpdate) {
+          await updateDoc(doc(userDocRef, docToUpdate.id), {
+            rand: editData,
+          });
+        }
+      } catch (error) {
+        console.error("Error updating document:", error.message);
       }
-    } catch (error) {
-      console.error("Error updating document:", error.message);
     }
+    if (priority == 'medium') {
+      try {
+        const userDocRef = collection(db, "users", user.uid, "mediumData");
+        const snapshot = await getDocs(userDocRef);
+        const docToUpdate = snapshot.docs[index];
+  
+        if (docToUpdate) {
+          await updateDoc(doc(userDocRef, docToUpdate.id), {
+            rand: editData,
+          });
+        }
+      } catch (error) {
+        console.error("Error updating document:", error.message);
+      }
+    }
+    if (priority == 'high') {
+      try {
+        const userDocRef = collection(db, "users", user.uid, "highData");
+        const snapshot = await getDocs(userDocRef);
+        const docToUpdate = snapshot.docs[index];
+  
+        if (docToUpdate) {
+          await updateDoc(doc(userDocRef, docToUpdate.id), {
+            rand: editData,
+          });
+        }
+      } catch (error) {
+        console.error("Error updating document:", error.message);
+      }
+    }
+    
   };
 
   const handleTextboxSubmit = async () => {
-
-    if (selectedPriority == '') {
+    if (selectedPriority == "") {
       setPriorityAlert(true);
       return;
     }
@@ -156,41 +202,102 @@ const UserHome = () => {
     }
 
     if (user) {
-      try {
-        await addDoc(collection(db, "users", user.uid, "data"), {
-          rand: newData,
-          date: selectedDate,
-          priority: selectedPriority,
-        });
-        console.log("Document written with ID");
-        setNewData("");
-      } catch (error) {
-        console.error("Error writing document:", error.message);
+      if (selectedPriority == "high") {
+        console.log('working high');
+        try {
+          await addDoc(collection(db, "users", user.uid, "highData"), {
+            rand: newData,
+            date: selectedDate,
+            priority: selectedPriority,
+          });
+          console.log("Document written with ID");
+          setNewData("");
+        } catch (error) {
+          console.error("Error writing document:", error.message);
+        }
+      }
+      if (selectedPriority == "low") {
+        console.log('working low');
+        try {
+          await addDoc(collection(db, "users", user.uid, "lowData"), {
+            rand: newData,
+            date: selectedDate,
+            priority: selectedPriority,
+          });
+          console.log("Document written with ID");
+          setNewData("");
+        } catch (error) {
+          console.error("Error writing document:", error.message);
+        }
+      }
+
+      if (selectedPriority == "medium") {
+        console.log('working medium');
+        try {
+          await addDoc(collection(db, "users", user.uid, "mediumData"), {
+            rand: newData,
+            date: selectedDate,
+            priority: selectedPriority,
+          });
+          console.log("Document written with ID");
+          setNewData("");
+        } catch (error) {
+          console.error("Error writing document:", error.message);
+        }
       }
     }
 
-    setSelectedDate('');
-    setSelectedPriority('');
+    setSelectedDate("");
+    setSelectedPriority("");
   };
 
-  const handleDelete = async (index) => {
+  const handleDelete = async (index, priority) => {
     const db = getFirestore();
 
-    try {
-      const userDocRef = collection(db, "users", user.uid, "data");
-      const snapshot = await getDocs(userDocRef);
-      const docToDelete = snapshot.docs[index];
-
-      if (docToDelete) {
-        await deleteDoc(doc(userDocRef, docToDelete.id));
+    if (priority == 'high') {
+      try {
+        const userDocRef = collection(db, "users", user.uid, "highData");
+        const snapshot = await getDocs(userDocRef);
+        const docToDelete = snapshot.docs[index];
+  
+        if (docToDelete) {
+          await deleteDoc(doc(userDocRef, docToDelete.id));
+        }
+      } catch (error) {
+        console.error("Error deleting document:", error.message);
       }
-    } catch (error) {
-      console.error("Error deleting document:", error.message);
+    }
+    if (priority == 'medium') {
+      try {
+        const userDocRef = collection(db, "users", user.uid, "mediumData");
+        const snapshot = await getDocs(userDocRef);
+        const docToDelete = snapshot.docs[index];
+  
+        if (docToDelete) {
+          await deleteDoc(doc(userDocRef, docToDelete.id));
+        }
+      } catch (error) {
+        console.error("Error deleting document:", error.message);
+      }
+    }
+    if (priority == 'low') {
+      try {
+        const userDocRef = collection(db, "users", user.uid, "lowData");
+        const snapshot = await getDocs(userDocRef);
+        const docToDelete = snapshot.docs[index];
+  
+        if (docToDelete) {
+          await deleteDoc(doc(userDocRef, docToDelete.id));
+        }
+      } catch (error) {
+        console.error("Error deleting document:", error.message);
+      }
     }
   };
 
-  const handleEdit = (index) => {
+  const handleEdit = (index, priority) => {
     setEditIndex(index);
+    setEditPriority(priority);
   };
 
   const closeEdit = () => {
@@ -227,7 +334,7 @@ const UserHome = () => {
                   color="inherit"
                   size="small"
                   onClick={() => {
-                    setAlert(false); // Update the state that controls the alert
+                    setAlert(false);
                   }}
                 >
                   <CloseIcon fontSize="inherit" />
@@ -249,14 +356,14 @@ const UserHome = () => {
               <p key={index} className="dataSize">
                 {data.rand}
               </p>
-              { data.date != '' && <p>Due: {data.date}</p>}
+              {data.date != "" && <p>Due: {data.date}</p>}
               <p>Priority: {data.priority}</p>
               <motion.button
                 variants={buttonVariants}
                 whileHover="hover"
                 whileTap="rest"
               >
-                <IconButton onClick={() => handleDelete(index)}>
+                <IconButton onClick={() => handleDelete(index, data.priority)}>
                   <FaTrash />
                 </IconButton>
               </motion.button>
@@ -268,12 +375,12 @@ const UserHome = () => {
               >
                 <button
                   className="submitButton"
-                  onClick={() => handleEdit(index)}
+                  onClick={() => handleEdit(index, data.priority)}
                 >
                   edit
                 </button>
               </motion.button>
-              {editIndex === index && (
+              {editIndex === index && editPriority == 'high' && (
                 <>
                   <button
                     className="submitButton"
@@ -318,7 +425,175 @@ const UserHome = () => {
 
                   <button
                     className="submitButton"
-                    onClick={() => handleEditSubmit(index)}
+                    onClick={() => handleEditSubmit(index, data.priority)}
+                  >
+                    Set Updated task
+                  </button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="dataDiv">
+          {userDataMedium.map((data, index) => (
+            <div className="dataBorder" style={{ overflow: "hidden" }}>
+              <p key={index} className="dataSize">
+                {data.rand}
+              </p>
+              {data.date != "" && <p>Due: {data.date}</p>}
+              <p>Priority: {data.priority}</p>
+              <motion.button
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="rest"
+              >
+                <IconButton onClick={() => handleDelete(index,data.priority)}>
+                  <FaTrash />
+                </IconButton>
+              </motion.button>
+
+              <motion.button
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="rest"
+              >
+                <button
+                  className="submitButton"
+                  onClick={() => handleEdit(index, data.priority)}
+                >
+                  edit
+                </button>
+              </motion.button>
+              {editIndex === index && editPriority == 'medium' && (
+                <>
+                  <button
+                    className="submitButton"
+                    style={{ paddingTop: "10px" }}
+                    onClick={closeEdit}
+                  >
+                    Close edit menu
+                  </button>
+                  <div>
+                    {maxEditData && (
+                      <Collapse in={editAlertOpen}>
+                        <Alert
+                          severity="error"
+                          action={
+                            <IconButton
+                              aria-label="close"
+                              color="inherit"
+                              size="small"
+                              onClick={() => {
+                                setEditAlertOpen(false);
+                              }}
+                            >
+                              <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                          }
+                          sx={{ mb: 2 }}
+                        >
+                          Maximum of 200 characters.
+                        </Alert>
+                      </Collapse>
+                    )}
+                  </div>
+                  <TextField
+                    id="outlined-basic"
+                    label="Enter Updated Task"
+                    variant="outlined"
+                    color="secondary"
+                    style={{ paddingTop: "10px" }}
+                    value={editData}
+                    onChange={(e) => handleEditTaskChange(e, index)}
+                  />
+
+                  <button
+                    className="submitButton"
+                    onClick={() => handleEditSubmit(index, data.priority)}
+                  >
+                    Set Updated task
+                  </button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="dataDiv">
+          {userDataLow.map((data, index) => (
+            <div className="dataBorder" style={{ overflow: "hidden" }}>
+              <p key={index} className="dataSize">
+                {data.rand}
+              </p>
+              {data.date != "" && <p>Due: {data.date}</p>}
+              <p>Priority: {data.priority}</p>
+              <motion.button
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="rest"
+              >
+                <IconButton onClick={() => handleDelete(index, data.priority)}>
+                  <FaTrash />
+                </IconButton>
+              </motion.button>
+
+              <motion.button
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="rest"
+              >
+                <button
+                  className="submitButton"
+                  onClick={() => handleEdit(index, data.priority)}
+                >
+                  edit
+                </button>
+              </motion.button>
+              {editIndex === index && editPriority == 'low' && (
+                <>
+                  <button
+                    className="submitButton"
+                    style={{ paddingTop: "10px" }}
+                    onClick={closeEdit}
+                  >
+                    Close edit menu
+                  </button>
+                  <div>
+                    {maxEditData && (
+                      <Collapse in={editAlertOpen}>
+                        <Alert
+                          severity="error"
+                          action={
+                            <IconButton
+                              aria-label="close"
+                              color="inherit"
+                              size="small"
+                              onClick={() => {
+                                setEditAlertOpen(false);
+                              }}
+                            >
+                              <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                          }
+                          sx={{ mb: 2 }}
+                        >
+                          Maximum of 200 characters.
+                        </Alert>
+                      </Collapse>
+                    )}
+                  </div>
+                  <TextField
+                    id="outlined-basic"
+                    label="Enter Updated Task"
+                    variant="outlined"
+                    color="secondary"
+                    style={{ paddingTop: "10px" }}
+                    value={editData}
+                    onChange={(e) => handleEditTaskChange(e, index)}
+                  />
+
+                  <button
+                    className="submitButton"
+                    onClick={() => handleEditSubmit(index, data.priority)}
                   >
                     Set Updated task
                   </button>
@@ -411,7 +686,10 @@ const UserHome = () => {
           </p>
         </div>
         <div className="submitDiv">
-          <select onChange={(e) => setSelectedPriority(e.target.value)} value={selectedPriority}>
+          <select
+            onChange={(e) => setSelectedPriority(e.target.value)}
+            value={selectedPriority}
+          >
             <option value="">Select Priority</option>
             <option value="high">High</option>
             <option value="medium">Medium</option>
