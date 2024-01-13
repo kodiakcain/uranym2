@@ -11,6 +11,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color: black;
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 255, 255, 255; /* White start */
     --background-end-rgb: 0, 0, 0; /* Black */
@@ -19,7 +20,7 @@
 
 body {
   font-family: "Exo 2", sans-serif;
-  color: rgb(var(--foreground-rgb));
+  color: black;
   background: linear-gradient(
     to right,
     black 0%,
