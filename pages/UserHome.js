@@ -181,7 +181,7 @@ const UserHome = () => {
       setPriorityAlert(true);
       return;
     }
-    if (newData.length > 200) {
+    if (newData.length > 2) {
       setMaxTextAlert(true);
       return;
     }
@@ -193,7 +193,15 @@ const UserHome = () => {
 
     const db = getFirestore();
     const userDocRef4 = await getDocs(
-      collection(db, "users", user.uid, "data")
+      collection(db, "users", user.uid, "lowData")
+    );
+
+    const userDocRef6 = await getDocs(
+      collection(db, "users", user.uid, "mediumData")
+    );
+
+    const userDocRef5 = await getDocs(
+      collection(db, "users", user.uid, "highData")
     );
     let totalData2 = 0;
 
@@ -201,7 +209,15 @@ const UserHome = () => {
       totalData2++;
     });
 
-    if (totalData2 >= 10) {
+    userDocRef5.forEach((doc) => {
+      totalData2++;
+    });
+
+    userDocRef6.forEach((doc) => {
+      totalData2++;
+    });
+
+    if (totalData2 >= 20) {
       setOpen(true);
       setAlert(true);
       return;
@@ -255,6 +271,7 @@ const UserHome = () => {
 
     setSelectedDate("");
     setSelectedPriority("");
+    setNewData("");
   };
 
   const handleDelete = async (index, priority) => {
