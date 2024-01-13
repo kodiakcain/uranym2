@@ -39,6 +39,9 @@ const UserHome = () => {
   const [priorityAlert, setPriorityAlert] = useState(false);
   const [userDataMedium, setUserDataMedium] = useState([]);
   const [userDataLow, setUserDataLow] = useState([]);
+  const [highAmount, setHighAmount] = useState(0);
+  const [mediumAmount, setMediumAmount] = useState(0);
+  const [lowAmount, setLowAmount] = useState(0);
 
 
   useEffect(() => {
@@ -58,18 +61,21 @@ const UserHome = () => {
           const unsubscribeHigh = onSnapshot(userDocRef3, (snapshot) => {
             const updatedData = snapshot.docs.map((doc) => doc.data());
             setUserData(updatedData);
+            setHighAmount(snapshot.size);
           });
 
           const userDocRef5 = collection(db, "users", user.uid, "mediumData");
           const unsubscribeMedium = onSnapshot(userDocRef5, (snapshot) => {
             const updatedDataMedium = snapshot.docs.map((doc) => doc.data());
             setUserDataMedium(updatedDataMedium);
+            setMediumAmount(snapshot.size);
           });
 
           const userDocRef6 = collection(db, "users", user.uid, "lowData");
           const unsubscribeLow = onSnapshot(userDocRef6, (snapshot) => {
             const updatedDataLow = snapshot.docs.map((doc) => doc.data());
             setUserDataLow(updatedDataLow);
+            setLowAmount(snapshot.size);
           });
 
           return () => {
@@ -346,11 +352,14 @@ const UserHome = () => {
             </Alert>
           </Collapse>
         )}
-        <div className="tasksBorder">
-          <h2 className="tasksText">Tasks</h2>
-        </div>
+        { highAmount == 0 && mediumAmount == 0 && lowAmount == 0 && <div className="tasksBorder">
+          <h2 className="tasksText">No Tasks - Enter a Task</h2>
+        </div> }
+        { highAmount != 0 && <div className="tasksBorder">
+          <h2 className="tasksText"><u>High Priority Tasks</u></h2>
+        </div> }
 
-        <div className="dataDivHigh">
+        { highAmount != 0 &&<div className="dataDivHigh">
           {userData.map((data, index) => (
             <div className="dataBorder" style={{ overflow: "hidden" }}>
               <p key={index} className="dataSize">
@@ -433,11 +442,14 @@ const UserHome = () => {
               )}
             </div>
           ))}
-        </div>
+        </div> }
         <div style={{paddingTop: '10px'}}>
 
         </div>
-        <div className="dataDivMedium">
+        { mediumAmount != 0 && <div className="tasksBorder">
+          <h2 className="tasksText"><u>Medium Priority Tasks</u></h2>
+        </div> }
+        { mediumAmount != 0 && <div className="dataDivMedium">
           {userDataMedium.map((data, index) => (
             <div className="dataBorder" style={{ overflow: "hidden" }}>
               <p key={index} className="dataSize">
@@ -520,11 +532,14 @@ const UserHome = () => {
               )}
             </div>
           ))}
-        </div>
+        </div> }
         <div style={{paddingTop: '10px'}}>
 
         </div>
-        <div className="dataDivLow">
+        { lowAmount != 0 && <div className="tasksBorder">
+          <h2 className="tasksText"><u>Low Priority Tasks</u></h2>
+        </div> }
+        { lowAmount != 0 && <div className="dataDivLow">
           {userDataLow.map((data, index) => (
             <div className="dataBorder" style={{ overflow: "hidden" }}>
               <p key={index} className="dataSize">
@@ -607,7 +622,7 @@ const UserHome = () => {
               )}
             </div>
           ))}
-        </div>
+        </div> }
         <div style={{paddingTop: '40px'}}>
 
         </div>
