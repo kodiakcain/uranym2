@@ -21,9 +21,13 @@ body {
   font-family: "Exo 2", sans-serif;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
+    to right,
+    black 0%,
+    gray 2%,
+    white 45%,
+    white 55%,
+    gray 98%,
+    black 100%
   );
 }
 
@@ -39,15 +43,47 @@ body {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.dataDivHigh {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  flex-wrap: wrap;
+  border-color: red;
+  border-radius: 2px;
+  border-width: 2px;
   
 }
 
-.dataDiv {
+.dataDivMedium {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-evenly;
   padding-top: 20px;
   padding-bottom: 20px;
+  flex-wrap: wrap;
+  border-color: yellow;
+  border-radius: 2px;
+  border-width: 2px;
+  
+}
+
+.dataDivLow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  flex-wrap: wrap;
+  border-color: green;
+  border-radius: 2px;
+  border-width: 2px;
+  
 }
 
 .logoutBorder {

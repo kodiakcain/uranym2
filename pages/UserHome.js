@@ -350,7 +350,7 @@ const UserHome = () => {
           <h2 className="tasksText">Tasks</h2>
         </div>
 
-        <div className="dataDiv">
+        <div className="dataDivHigh">
           {userData.map((data, index) => (
             <div className="dataBorder" style={{ overflow: "hidden" }}>
               <p key={index} className="dataSize">
@@ -434,7 +434,10 @@ const UserHome = () => {
             </div>
           ))}
         </div>
-        <div className="dataDiv">
+        <div style={{paddingTop: '10px'}}>
+
+        </div>
+        <div className="dataDivMedium">
           {userDataMedium.map((data, index) => (
             <div className="dataBorder" style={{ overflow: "hidden" }}>
               <p key={index} className="dataSize">
@@ -518,7 +521,10 @@ const UserHome = () => {
             </div>
           ))}
         </div>
-        <div className="dataDiv">
+        <div style={{paddingTop: '10px'}}>
+
+        </div>
+        <div className="dataDivLow">
           {userDataLow.map((data, index) => (
             <div className="dataBorder" style={{ overflow: "hidden" }}>
               <p key={index} className="dataSize">
@@ -602,6 +608,9 @@ const UserHome = () => {
             </div>
           ))}
         </div>
+        <div style={{paddingTop: '40px'}}>
+
+        </div>
         <div>
           {maxTextAlert && (
             <Collapse in={open}>
@@ -680,10 +689,8 @@ const UserHome = () => {
             onChange={handleTextboxChange}
           />
         </div>
+        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
         <div className="submitDiv">
-          <p>
-            <u>priority</u>
-          </p>
         </div>
         <div className="submitDiv">
           <select
@@ -698,7 +705,6 @@ const UserHome = () => {
         </div>
         <div className="submitDiv">
           <label for="datepicker">
-            <u>Select a due date:</u>
           </label>
         </div>
         <div className="submitDiv">
@@ -710,6 +716,8 @@ const UserHome = () => {
             onChange={(e) => setSelectedDate(e.target.value)}
           />
         </div>
+        </div>
+        
         <div className="submitDiv">
           <motion.button
             variants={buttonVariants}
@@ -725,6 +733,10 @@ const UserHome = () => {
           </motion.button>
         </div>
       </div>
+      <div style={{paddingTop: '30px'}}>
+
+      </div>
+
     </main>
   );
 };
