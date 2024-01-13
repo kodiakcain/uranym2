@@ -181,7 +181,7 @@ const UserHome = () => {
       setPriorityAlert(true);
       return;
     }
-    if (newData.length > 2) {
+    if (newData.length > 200) {
       setMaxTextAlert(true);
       return;
     }
