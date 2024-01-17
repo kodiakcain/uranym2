@@ -42,6 +42,7 @@ const UserHome = () => {
   const [highAmount, setHighAmount] = useState(0);
   const [mediumAmount, setMediumAmount] = useState(0);
   const [lowAmount, setLowAmount] = useState(0);
+  const [newDate, setNewDate] = useState("");
 
 
   useEffect(() => {
@@ -137,6 +138,7 @@ const UserHome = () => {
         if (docToUpdate) {
           await updateDoc(doc(userDocRef, docToUpdate.id), {
             rand: editData,
+            date: selectedDate,
           });
         }
       } catch (error) {
@@ -152,6 +154,7 @@ const UserHome = () => {
         if (docToUpdate) {
           await updateDoc(doc(userDocRef, docToUpdate.id), {
             rand: editData,
+            date: selectedDate,
           });
         }
       } catch (error) {
@@ -167,6 +170,7 @@ const UserHome = () => {
         if (docToUpdate) {
           await updateDoc(doc(userDocRef, docToUpdate.id), {
             rand: editData,
+            date: selectedDate,
           });
         }
       } catch (error) {
@@ -496,6 +500,7 @@ const UserHome = () => {
                   edit
                 </button>
               </motion.button>
+              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10px'}}>
               {editIndex === index && editPriority == 'medium' && (
                 <>
                   <button
@@ -538,7 +543,15 @@ const UserHome = () => {
                     value={editData}
                     onChange={(e) => handleEditTaskChange(e, index)}
                   />
-
+                  <div>
+                    <input
+                      type="date"
+                      id="datepicker"
+                      name="datepicker"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                    />
+                  </div>
                   <button
                     className="submitButton"
                     onClick={() => handleEditSubmit(index, data.priority)}
@@ -547,6 +560,7 @@ const UserHome = () => {
                   </button>
                 </>
               )}
+              </div>
             </div>
           ))}
         </div> }
