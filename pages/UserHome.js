@@ -410,6 +410,7 @@ const UserHome = () => {
                   edit
                 </button>
               </motion.button>
+              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10px'}}>
               {editIndex === index && editPriority == 'high' && (
                 <>
                   <button
@@ -452,7 +453,13 @@ const UserHome = () => {
                     value={editData}
                     onChange={(e) => handleEditTaskChange(e, index)}
                   />
-
+                    <input
+                      type="date"
+                      id="datepicker"
+                      name="datepicker"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                    />
                   <button
                     className="submitButton"
                     onClick={() => handleEditSubmit(index, data.priority)}
@@ -461,6 +468,7 @@ const UserHome = () => {
                   </button>
                 </>
               )}
+            </div>
             </div>
           ))}
         </div> }
@@ -600,6 +608,7 @@ const UserHome = () => {
                   edit
                 </button>
               </motion.button>
+              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10px'}}>
               {editIndex === index && editPriority == 'low' && (
                 <>
                   <button
@@ -642,7 +651,13 @@ const UserHome = () => {
                     value={editData}
                     onChange={(e) => handleEditTaskChange(e, index)}
                   />
-
+                    <input
+                      type="date"
+                      id="datepicker"
+                      name="datepicker"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                    />
                   <button
                     className="submitButton"
                     onClick={() => handleEditSubmit(index, data.priority)}
@@ -651,6 +666,7 @@ const UserHome = () => {
                   </button>
                 </>
               )}
+            </div>
             </div>
           ))}
         </div> }
