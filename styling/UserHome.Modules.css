@@ -3,145 +3,215 @@
 @import "tailwindcss/utilities";
 
 @import url("https://fonts.googleapis.com/css2?family=Exo 2:wght@500&display=swap");
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255; /* White start */
-  --background-end-rgb: 0, 0, 0; /* Black */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: black;
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 255, 255, 255; /* White start */
-    --background-end-rgb: 0, 0, 0; /* Black */
-  }
-}
 
 body {
   font-family: "Exo 2", sans-serif;
   color: black;
-  background: linear-gradient(
-    to right,
-    black 0%,
-    gray 2%,
-    white 45%,
-    white 55%,
-    gray 98%,
-    black 100%
-  );
+  background-color: #EDF2F7;
+  height: 100vh;
+}
+
+.appbar {
+  background-color: #2D3748;
+  height: 15vh;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  color: white;
+  border-bottom: 5px solid #38B2AC;
+}
+
+.appbar h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.appbar-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar {
+  background-color: #2D3748;
+  width: 250px;
+  height: calc(100vh - 15vh);
+  position: fixed;
+  top: 15vh;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  color: white;
+  border-right: 5px solid #38B2AC;
+  z-index: 1000;
+}
+
+.sidebar h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sidebar select {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  color: #2D3748;
+}
+
+.teal-calendar {
+  background-color: #38B2AC;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.teal-calendar .react-calendar__tile--active {
+  background-color: #2C7A7B !important;
+  color: white;
+}
+
+.calndiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.main-content {
+  margin-left: 270px;
+  margin-top: 15vh;
+  padding: 20px;
+  height: calc(100vh - 15vh);
+  overflow-y: auto;
+}
+
+.tasksSection {
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.tasksSection h2 {
+  font-size: 1.5rem;
+  color: #2D3748;
+  margin-bottom: 10px;
 }
 
 .dataBorder {
-  font-size: 10px;
-  font-family: "Exo 2", sans-serif;
-  border-color: black;
-  border-radius: 2px;
-  border-width: 2px;
-  padding: 30px;
-  border-style: solid;
-  width: fit-content;
+  font-size: 1rem;
+  padding: 20px;
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
-  flex-direction: column;
-  max-width: 300px;
-  word-wrap: break-word;
+  align-items: center;
+  overflow: scroll;
 }
 
-.dataDivHigh {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  flex-wrap: wrap;
-  border-color: red;
-  border-radius: 2px;
-  border-width: 2px;
-  
+.dataBorder p {
+  margin: 0;
 }
 
-.dataDivMedium {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  flex-wrap: wrap;
-  border-color: yellow;
-  border-radius: 2px;
-  border-width: 2px;
-  
+.submitButton {
+  background-color: #38B2AC;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
 }
 
-.dataDivLow {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  flex-wrap: wrap;
-  border-color: green;
-  border-radius: 2px;
-  border-width: 2px;
-  
-}
-
-.logoutBorder {
-  font-size: 10px;
-  font-family: "Exo 2", sans-serif;
-  border-color: black;
-  border-radius: 2px;
-  border-width: 2px;
-  padding: 10px;
-  border-style: solid;
-  width: fit-content;
-}
-
-.logoutDiv,
-.tasksBorder {
-  justify-content: center;
-  display: flex;
-  padding-top: 20px;
-}
-
-.tasksText {
-  font-family: "Exo 2", sans-serif;
-  font-size: 30px;
-}
-
-.mainDiv {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.inputWidth {
-  width: 100px;
+.submitButton:hover {
+  background-color: #2C7A7B;
 }
 
 .textBox {
   display: flex;
+  flex-direction: column;
+  gap: 20px;
   justify-content: center;
+  align-items: center;
 }
 
-.submitButton {
-  font-size: 10px;
-  font-family: "Exo 2", sans-serif;
-  border-color: black;
-  border-radius: 2px;
-  border-width: 2px;
-  padding: 10px;
-  border-style: solid;
-  width: fit-content;
+.tasks {
+  font-size: large;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  margin-bottom: 5px;
 }
 
 .submitDiv {
   display: flex;
   justify-content: center;
-  padding-top: 10px;
+  align-items: center;
+  margin-top: 20px;
 }
 
-.dataSize {
-  font-size: 15px;
+@media (max-width: 768px) {
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
+  .main-content {
+    margin-left: 0;
+    margin-top: calc(15vh + 10px); 
+    height: auto;
+    padding-bottom: 20px;
+    overflow-y: visible;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: relative;
+    top: 15vh;
+    left: 0;
+    height: auto;
+    padding: 10px;
+    border-right: none;
+    border-bottom: 5px solid #38B2AC;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0; 
+  }
+
+  .appbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin-bottom: 0;
+    padding: 0 20px;
+  }
+
+  .appbar-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .sidebar select {
+    width: 90%;
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .teal-calendar {
+    width: 100%;
+  }
 }

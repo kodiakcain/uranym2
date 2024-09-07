@@ -4,27 +4,12 @@
 
 
 @import url('https://fonts.googleapis.com/css2?family=Exo 2:wght@500&display=swap');
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255,255,255; /* Purple start */
-  --background-end-rgb: 0, 0, 0; /* Black */
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: black;
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 255, 255, 255; /* Dark purple start */
-    --background-end-rgb: 0, 0, 0; /* Black */
-  }
+:root {
+  max-width: 100vw;
+  max-height: 100vh;
 }
 
 body {
-  font-family: 'Orbitron', sans-serif;
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
-  );  
+  font-family: 'Orbitron', sans-serif; 
 }

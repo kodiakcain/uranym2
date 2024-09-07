@@ -1,55 +1,42 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { auth } from "../firebase";
 import {
-  getFirestore,
-  addDoc,
   collection,
-  getDocs,
   onSnapshot,
   deleteDoc,
+  addDoc,
   updateDoc,
   doc,
+  getFirestore,
+  getDocs,
 } from "firebase/firestore";
-import "../styling/UserHome.Modules.css";
 import Link from "next/link";
-import Alert from "@mui/material/Alert";
-import { motion } from "framer-motion";
-import IconButton from "@mui/material/IconButton";
-import Collapse from "@mui/material/Collapse";
-import Button from "@mui/material/Button";
-import CloseIcon from "@mui/icons-material/Close";
-import TextField from "@mui/material/TextField";
 import { FaTrash } from "react-icons/fa";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import Alert from "@mui/material/Alert";
+import "../styling/UserHome.Modules.css";
 
 const UserHome = () => {
   const [user, setUser] = useState(null);
+  const [selectedPriority, setSelectedPriority] = useState("high");
   const [userData, setUserData] = useState([]);
   const [newData, setNewData] = useState("");
-  const [maxUserAlert, setAlert] = useState(false);
-  const [open, setOpen] = React.useState(true);
-  const [maxTextAlert, setMaxTextAlert] = useState(false);
-  const [lessTextAlert, setLessTextAlert] = useState(false);
-  const [editIndex, setEditIndex] = useState(null); 
-  const [editPriority, setEditPriority] = useState(null);
-  const [editData, setEditData] = useState("");
-  const [maxEditData, setMaxEditData] = useState(false);
-  const [editAlertOpen, setEditAlertOpen] = React.useState(true);
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedPriority, setSelectedPriority] = useState("");
-  const [priorityAlert, setPriorityAlert] = useState(false);
-  const [userDataMedium, setUserDataMedium] = useState([]);
-  const [userDataLow, setUserDataLow] = useState([]);
-  const [highAmount, setHighAmount] = useState(0);
-  const [mediumAmount, setMediumAmount] = useState(0);
-  const [lowAmount, setLowAmount] = useState(0);
-  const [newDate, setNewDate] = useState("");
-
+  const [editIndex, setEditIndex] = useState(null);
+  const [editData, setEditData] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarTasks, setCalendarTasks] = useState([]);
+  const [maxTasksReached, setMaxTasksReached] = useState(false);
+  const [taskTooLong, setTaskTooLong] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -57,749 +44,254 @@ const UserHome = () => {
     const fetchDataFromFirestore = async () => {
       const db = getFirestore();
       if (user) {
-        try {
-          const userDocRef3 = collection(db, "users", user.uid, "highData");
-          const unsubscribeHigh = onSnapshot(userDocRef3, (snapshot) => {
-            const updatedData = snapshot.docs.map((doc) => doc.data());
-            setUserData(updatedData);
-            setHighAmount(snapshot.size);
-          });
-
-          const userDocRef5 = collection(db, "users", user.uid, "mediumData");
-          const unsubscribeMedium = onSnapshot(userDocRef5, (snapshot) => {
-            const updatedDataMedium = snapshot.docs.map((doc) => doc.data());
-            setUserDataMedium(updatedDataMedium);
-            setMediumAmount(snapshot.size);
-          });
-
-          const userDocRef6 = collection(db, "users", user.uid, "lowData");
-          const unsubscribeLow = onSnapshot(userDocRef6, (snapshot) => {
-            const updatedDataLow = snapshot.docs.map((doc) => doc.data());
-            setUserDataLow(updatedDataLow);
-            setLowAmount(snapshot.size);
-          });
-
-          return () => {
-            unsubscribeHigh();
-            unsubscribeMedium();
-            unsubscribeLow();
-          };
-        } catch (error) {
-          console.error("Error fetching data from Firestore:", error.message);
-        }
+        const userDocRef = collection(
+          db,
+          "users",
+          user.uid,
+          selectedPriority + "Data"
+        );
+        const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+          const updatedData = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setUserData(updatedData);
+        });
+        return () => unsubscribe();
       }
     };
-
     fetchDataFromFirestore();
-  }, [user]);
+  }, [user, selectedPriority]);
 
-  const buttonVariants = {
-    rest: {
-      scale: 1,
-      boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.1)",
-    },
-    hover: {
-      scale: 1.1,
-      boxShadow: "0px 0px 16px rgba(0, 0, 0, 0.2)",
-    },
-  };
-
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      setUser(null);
-    } catch (error) {
-      console.error("Error logging out:", error.message);
-    }
-  };
-
-  const handleTextboxChange = (e) => {
-    setNewData(e.target.value);
-  };
-
-  const handleEditTaskChange = (e, index) => {
-    setEditData(e.target.value);
-  };
-
-  const handleEditSubmit = async (index, priority) => {
-    if (editData.length > 200) {
-      setEditAlertOpen(true);
-      setMaxEditData(true);
-      return;
-    }
-    const db = getFirestore();
-
-    if (priority == 'low') {
-      try {
-        const userDocRef = collection(db, "users", user.uid, "lowData");
-        const snapshot = await getDocs(userDocRef);
-        const docToUpdate = snapshot.docs[index];
-  
-        if (docToUpdate) {
-          await updateDoc(doc(userDocRef, docToUpdate.id), {
-            rand: editData,
-            date: selectedDate,
-          });
-        }
-      } catch (error) {
-        console.error("Error updating document:", error.message);
-      }
-    }
-    if (priority == 'medium') {
-      try {
-        const userDocRef = collection(db, "users", user.uid, "mediumData");
-        const snapshot = await getDocs(userDocRef);
-        const docToUpdate = snapshot.docs[index];
-  
-        if (docToUpdate) {
-          await updateDoc(doc(userDocRef, docToUpdate.id), {
-            rand: editData,
-            date: selectedDate,
-          });
-        }
-      } catch (error) {
-        console.error("Error updating document:", error.message);
-      }
-    }
-    if (priority == 'high') {
-      try {
-        const userDocRef = collection(db, "users", user.uid, "highData");
-        const snapshot = await getDocs(userDocRef);
-        const docToUpdate = snapshot.docs[index];
-  
-        if (docToUpdate) {
-          await updateDoc(doc(userDocRef, docToUpdate.id), {
-            rand: editData,
-            date: selectedDate,
-          });
-        }
-      } catch (error) {
-        console.error("Error updating document:", error.message);
-      }
-    }
-    
+  const handlePriorityChange = (e) => {
+    setSelectedPriority(e.target.value);
   };
 
   const handleTextboxSubmit = async () => {
-    if (selectedPriority == "") {
-      setPriorityAlert(true);
-      return;
-    }
-    if (newData.length > 200) {
-      setMaxTextAlert(true);
-      return;
-    }
+    if (newData === "" || selectedDate === "") return;
 
-    if (newData.length <= 0) {
-      setLessTextAlert(true);
+    if (newData.length > 100) {
+      setTaskTooLong(true);
+      setTimeout(() => setTaskTooLong(false), 3000);
       return;
     }
 
     const db = getFirestore();
-    const userDocRef4 = await getDocs(
-      collection(db, "users", user.uid, "lowData")
-    );
 
-    const userDocRef6 = await getDocs(
-      collection(db, "users", user.uid, "mediumData")
-    );
+    const highTasksRef = collection(db, "users", user.uid, "highData");
+    const mediumTasksRef = collection(db, "users", user.uid, "mediumData");
+    const lowTasksRef = collection(db, "users", user.uid, "lowData");
 
-    const userDocRef5 = await getDocs(
-      collection(db, "users", user.uid, "highData")
-    );
-    let totalData2 = 0;
+    const highTasksSnapshot = await getDocs(highTasksRef);
+    const mediumTasksSnapshot = await getDocs(mediumTasksRef);
+    const lowTasksSnapshot = await getDocs(lowTasksRef);
 
-    userDocRef4.forEach((doc) => {
-      totalData2++;
-    });
+    const totalTasks =
+      highTasksSnapshot.size + mediumTasksSnapshot.size + lowTasksSnapshot.size;
 
-    userDocRef5.forEach((doc) => {
-      totalData2++;
-    });
-
-    userDocRef6.forEach((doc) => {
-      totalData2++;
-    });
-
-    if (totalData2 >= 20) {
-      setOpen(true);
-      setAlert(true);
+    if (totalTasks >= 11) {
+      setMaxTasksReached(true);
+      setTimeout(() => setMaxTasksReached(false), 3000);
       return;
     }
 
-    if (user) {
-      if (selectedPriority == "high") {
-        console.log('working high');
-        try {
-          await addDoc(collection(db, "users", user.uid, "highData"), {
-            rand: newData,
-            date: selectedDate,
-            priority: selectedPriority,
-          });
-          console.log("Document written with ID");
-          setNewData("");
-        } catch (error) {
-          console.error("Error writing document:", error.message);
-        }
-      }
-      if (selectedPriority == "low") {
-        console.log('working low');
-        try {
-          await addDoc(collection(db, "users", user.uid, "lowData"), {
-            rand: newData,
-            date: selectedDate,
-            priority: selectedPriority,
-          });
-          console.log("Document written with ID");
-          setNewData("");
-        } catch (error) {
-          console.error("Error writing document:", error.message);
-        }
-      }
+    await addDoc(collection(db, "users", user.uid, selectedPriority + "Data"), {
+      rand: newData,
+      date: selectedDate,
+    });
 
-      if (selectedPriority == "medium") {
-        console.log('working medium');
-        try {
-          await addDoc(collection(db, "users", user.uid, "mediumData"), {
-            rand: newData,
-            date: selectedDate,
-            priority: selectedPriority,
-          });
-          console.log("Document written with ID");
-          setNewData("");
-        } catch (error) {
-          console.error("Error writing document:", error.message);
-        }
-      }
-    }
-
-    setSelectedDate("");
-    setSelectedPriority("");
     setNewData("");
+    setSelectedDate("");
   };
 
-  const handleDelete = async (index, priority) => {
+  const handleEditTaskSubmit = async (id) => {
     const db = getFirestore();
-
-    if (priority == 'high') {
-      try {
-        const userDocRef = collection(db, "users", user.uid, "highData");
-        const snapshot = await getDocs(userDocRef);
-        const docToDelete = snapshot.docs[index];
-  
-        if (docToDelete) {
-          await deleteDoc(doc(userDocRef, docToDelete.id));
-        }
-      } catch (error) {
-        console.error("Error deleting document:", error.message);
-      }
-    }
-    if (priority == 'medium') {
-      try {
-        const userDocRef = collection(db, "users", user.uid, "mediumData");
-        const snapshot = await getDocs(userDocRef);
-        const docToDelete = snapshot.docs[index];
-  
-        if (docToDelete) {
-          await deleteDoc(doc(userDocRef, docToDelete.id));
-        }
-      } catch (error) {
-        console.error("Error deleting document:", error.message);
-      }
-    }
-    if (priority == 'low') {
-      try {
-        const userDocRef = collection(db, "users", user.uid, "lowData");
-        const snapshot = await getDocs(userDocRef);
-        const docToDelete = snapshot.docs[index];
-  
-        if (docToDelete) {
-          await deleteDoc(doc(userDocRef, docToDelete.id));
-        }
-      } catch (error) {
-        console.error("Error deleting document:", error.message);
-      }
-    }
-  };
-
-  const handleEdit = (index, priority) => {
-    setEditIndex(index);
-    setEditPriority(priority);
-  };
-
-  const closeEdit = () => {
+    const docRef = doc(db, "users", user.uid, selectedPriority + "Data", id);
+    await updateDoc(docRef, { rand: editData, date: editDate });
     setEditIndex(null);
+    setEditData("");
+    setEditDate("");
+  };
+
+  const handleDelete = async (id) => {
+    const db = getFirestore();
+    await deleteDoc(doc(db, "users", user.uid, selectedPriority + "Data", id));
+  };
+
+  const handleEdit = (index, data) => {
+    setEditIndex(index);
+    setEditData(data.rand);
+    setEditDate(data.date);
+  };
+
+  const handleDateClick = (date) => {
+    const tasksForDate = userData.filter(
+      (task) => task.date === date.toISOString().split("T")[0]
+    );
+    setCalendarTasks(tasksForDate);
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 blackText">
-      <div className="mainDiv">
-        <div className="logoutDiv">
-          <motion.button
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="rest"
-          >
-            {user ? (
-              <Link href="/">
-                <button onClick={handleLogout} className="logoutBorder">
-                  Logout
-                </button>
-              </Link>
-            ) : (
-              <p>User not logged in</p>
-            )}
-          </motion.button>
-        </div>
-        {maxUserAlert && (
-          <Collapse in={maxUserAlert}>
-            <Alert
-              severity="error"
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setAlert(false);
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-              sx={{ mb: 2 }}
-            >
-              Max Data Reached.
-            </Alert>
-          </Collapse>
-        )}
-        { highAmount == 0 && mediumAmount == 0 && lowAmount == 0 && <div className="tasksBorder">
-          <h2 className="tasksText">No Tasks - Enter a Task</h2>
-        </div> }
-        { highAmount != 0 && <div className="tasksBorder">
-          <h2 className="tasksText"><u>High Priority Tasks</u></h2>
-        </div> }
-
-        { highAmount != 0 &&<div className="dataDivHigh">
-          {userData.map((data, index) => (
-            <div className="dataBorder" style={{ overflow: "hidden" }}>
-              <p key={index} className="dataSize">
-                {data.rand}
-              </p>
-              {data.date != "" && <p>Due: {data.date}</p>}
-              <p>Priority: {data.priority}</p>
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="rest"
-              >
-                <IconButton onClick={() => handleDelete(index, data.priority)}>
-                  <FaTrash />
-                </IconButton>
-              </motion.button>
-
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="rest"
-              >
-                <button
-                  className="submitButton"
-                  onClick={() => handleEdit(index, data.priority)}
-                >
-                  edit
-                </button>
-              </motion.button>
-              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10px'}}>
-              {editIndex === index && editPriority == 'high' && (
-                <>
-                  <button
-                    className="submitButton"
-                    style={{ paddingTop: "10px" }}
-                    onClick={closeEdit}
-                  >
-                    Close edit menu
-                  </button>
-                  <div>
-                    {maxEditData && (
-                      <Collapse in={editAlertOpen}>
-                        <Alert
-                          severity="error"
-                          action={
-                            <IconButton
-                              aria-label="close"
-                              color="inherit"
-                              size="small"
-                              onClick={() => {
-                                setEditAlertOpen(false);
-                              }}
-                            >
-                              <CloseIcon fontSize="inherit" />
-                            </IconButton>
-                          }
-                          sx={{ mb: 2 }}
-                        >
-                          Maximum of 200 characters.
-                        </Alert>
-                      </Collapse>
-                    )}
-                  </div>
-                  <TextField
-                    id="outlined-basic"
-                    label="Enter Updated Task"
-                    variant="outlined"
-                    color="secondary"
-                    style={{ paddingTop: "10px" }}
-                    value={editData}
-                    onChange={(e) => handleEditTaskChange(e, index)}
-                  />
-                    <input
-                      type="date"
-                      id="datepicker"
-                      name="datepicker"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                    />
-                  <button
-                    className="submitButton"
-                    onClick={() => handleEditSubmit(index, data.priority)}
-                  >
-                    Set Updated task
-                  </button>
-                </>
-              )}
-            </div>
-            </div>
-          ))}
-        </div> }
-        <div style={{paddingTop: '10px'}}>
-
-        </div>
-        { mediumAmount != 0 && <div className="tasksBorder">
-          <h2 className="tasksText"><u>Medium Priority Tasks</u></h2>
-        </div> }
-        { mediumAmount != 0 && <div className="dataDivMedium">
-          {userDataMedium.map((data, index) => (
-            <div className="dataBorder" style={{ overflow: "hidden" }}>
-              <p key={index} className="dataSize">
-                {data.rand}
-              </p>
-              {data.date != "" && <p>Due: {data.date}</p>}
-              <p>Priority: {data.priority}</p>
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="rest"
-              >
-                <IconButton onClick={() => handleDelete(index,data.priority)}>
-                  <FaTrash />
-                </IconButton>
-              </motion.button>
-
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="rest"
-              >
-                <button
-                  className="submitButton"
-                  onClick={() => handleEdit(index, data.priority)}
-                >
-                  edit
-                </button>
-              </motion.button>
-              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10px'}}>
-              {editIndex === index && editPriority == 'medium' && (
-                <>
-                  <button
-                    className="submitButton"
-                    style={{ paddingTop: "10px" }}
-                    onClick={closeEdit}
-                  >
-                    Close edit menu
-                  </button>
-                  <div>
-                    {maxEditData && (
-                      <Collapse in={editAlertOpen}>
-                        <Alert
-                          severity="error"
-                          action={
-                            <IconButton
-                              aria-label="close"
-                              color="inherit"
-                              size="small"
-                              onClick={() => {
-                                setEditAlertOpen(false);
-                              }}
-                            >
-                              <CloseIcon fontSize="inherit" />
-                            </IconButton>
-                          }
-                          sx={{ mb: 2 }}
-                        >
-                          Maximum of 200 characters.
-                        </Alert>
-                      </Collapse>
-                    )}
-                  </div>
-                  <TextField
-                    id="outlined-basic"
-                    label="Enter Updated Task"
-                    variant="outlined"
-                    color="secondary"
-                    style={{ paddingTop: "10px" }}
-                    value={editData}
-                    onChange={(e) => handleEditTaskChange(e, index)}
-                  />
-                  <div>
-                    <input
-                      type="date"
-                      id="datepicker"
-                      name="datepicker"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                    />
-                  </div>
-                  <button
-                    className="submitButton"
-                    onClick={() => handleEditSubmit(index, data.priority)}
-                  >
-                    Set Updated task
-                  </button>
-                </>
-              )}
-              </div>
-            </div>
-          ))}
-        </div> }
-        <div style={{paddingTop: '10px'}}>
-
-        </div>
-        { lowAmount != 0 && <div className="tasksBorder">
-          <h2 className="tasksText"><u>Low Priority Tasks</u></h2>
-        </div> }
-        { lowAmount != 0 && <div className="dataDivLow">
-          {userDataLow.map((data, index) => (
-            <div className="dataBorder" style={{ overflow: "hidden" }}>
-              <p key={index} className="dataSize">
-                {data.rand}
-              </p>
-              {data.date != "" && <p>Due: {data.date}</p>}
-              <p>Priority: {data.priority}</p>
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="rest"
-              >
-                <IconButton onClick={() => handleDelete(index, data.priority)}>
-                  <FaTrash />
-                </IconButton>
-              </motion.button>
-
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="rest"
-              >
-                <button
-                  className="submitButton"
-                  onClick={() => handleEdit(index, data.priority)}
-                >
-                  edit
-                </button>
-              </motion.button>
-              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10px'}}>
-              {editIndex === index && editPriority == 'low' && (
-                <>
-                  <button
-                    className="submitButton"
-                    style={{ paddingTop: "10px" }}
-                    onClick={closeEdit}
-                  >
-                    Close edit menu
-                  </button>
-                  <div>
-                    {maxEditData && (
-                      <Collapse in={editAlertOpen}>
-                        <Alert
-                          severity="error"
-                          action={
-                            <IconButton
-                              aria-label="close"
-                              color="inherit"
-                              size="small"
-                              onClick={() => {
-                                setEditAlertOpen(false);
-                              }}
-                            >
-                              <CloseIcon fontSize="inherit" />
-                            </IconButton>
-                          }
-                          sx={{ mb: 2 }}
-                        >
-                          Maximum of 200 characters.
-                        </Alert>
-                      </Collapse>
-                    )}
-                  </div>
-                  <TextField
-                    id="outlined-basic"
-                    label="Enter Updated Task"
-                    variant="outlined"
-                    color="secondary"
-                    style={{ paddingTop: "10px" }}
-                    value={editData}
-                    onChange={(e) => handleEditTaskChange(e, index)}
-                  />
-                    <input
-                      type="date"
-                      id="datepicker"
-                      name="datepicker"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                    />
-                  <button
-                    className="submitButton"
-                    onClick={() => handleEditSubmit(index, data.priority)}
-                  >
-                    Set Updated task
-                  </button>
-                </>
-              )}
-            </div>
-            </div>
-          ))}
-        </div> }
-        <div style={{paddingTop: '40px'}}>
-
-        </div>
-        <div>
-          {maxTextAlert && (
-            <Collapse in={open}>
-              <Alert
-                severity="error"
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={() => {
-                      setMaxTextAlert(false);
-                    }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                }
-                sx={{ mb: 2 }}
-              >
-                Task cannot exceed 200 characters.
-              </Alert>
-            </Collapse>
-          )}
-          {lessTextAlert && (
-            <Collapse in={open}>
-              <Alert
-                severity="error"
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={() => {
-                      setLessTextAlert(false);
-                    }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                }
-                sx={{ mb: 2 }}
-              >
-                Task cannot be 0 characters.
-              </Alert>
-            </Collapse>
-          )}
-          {priorityAlert && (
-            <Collapse in={open}>
-              <Alert
-                severity="error"
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={() => {
-                      setPriorityAlert(false);
-                    }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                }
-                sx={{ mb: 2 }}
-              >
-                Must select priority for task.
-              </Alert>
-            </Collapse>
-          )}
-        </div>
-        <div className="textBox">
-          <TextField
-            id="outlined-basic"
-            label="Enter Task"
-            variant="outlined"
-            color="secondary"
-            value={newData}
-            onChange={handleTextboxChange}
-          />
-        </div>
-        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-        <div className="submitDiv">
-        </div>
-        <div className="submitDiv">
-          <select
-            onChange={(e) => setSelectedPriority(e.target.value)}
-            value={selectedPriority}
-          >
-            <option value="">Select Priority</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
-        <div className="submitDiv">
-          <label for="datepicker">
-          </label>
-        </div>
-        <div className="submitDiv">
-          <input
-            type="date"
-            id="datepicker"
-            name="datepicker"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-          />
-        </div>
-        </div>
-        
-        <div className="submitDiv">
-          <motion.button
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="rest"
-          >
-            <button
-              onClick={handleTextboxSubmit}
-              className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded submitButton"
-            >
-              Submit Task
+    <div>
+      <div className="appbar">
+        <h1>Task Manager</h1>
+        <div className="appbar-links">
+          <Link href="/">
+            <button onClick={() => auth.signOut()} className="submitButton">
+              Logout
             </button>
-          </motion.button>
+          </Link>
         </div>
       </div>
-      <div style={{paddingTop: '30px'}}>
 
+      {maxTasksReached && (
+        <Alert
+          severity="error"
+          onClose={() => setMaxTasksReached(false)}
+          style={{
+            position: "fixed",
+            top: "15vh",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 1000,
+            width: "80%",
+            maxWidth: "600px",
+          }}
+        >
+          Maximum of 10 tasks reached. Please delete a task to add a new one.
+        </Alert>
+      )}
+
+      {taskTooLong && (
+        <Alert
+          severity="error"
+          onClose={() => setTaskTooLong(false)}
+          style={{
+            position: "fixed",
+            top: "15vh",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 1000,
+            width: "80%",
+            maxWidth: "600px",
+          }}
+        >
+          Task is too long! Please limit to 100 characters.
+        </Alert>
+      )}
+
+      <div className="sidebar">
+        <h2>Priority</h2>
+        <select onChange={handlePriorityChange} value={selectedPriority}>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        <button
+          className="submitButton"
+          onClick={() => setShowCalendar(!showCalendar)}
+        >
+          {showCalendar ? "Show Tasks" : "Show Calendar"}
+        </button>
       </div>
 
-    </main>
+      <div className="main-content">
+        {showCalendar ? (
+          <>
+          <div className="calndiv">
+            <h2>Calendar: pick a date to see tasks.</h2>
+            
+              <Calendar
+                onClickDay={handleDateClick}
+                className="teal-calendar"
+              />
+            </div>
+
+            {calendarTasks.length > 0 && (
+              <div className="tasksSection">
+                <h3>Tasks on Selected Date</h3>
+                {calendarTasks.map((task, index) => (
+                  <div key={index} className="dataBorder">
+                    <p>{task.rand}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <h1 className="tasks">
+              Tasks -{" "}
+              {selectedPriority.charAt(0).toUpperCase() +
+                selectedPriority.slice(1)}{" "}
+              Priority
+            </h1>
+
+            <div className="tasksSection">
+              {userData.map((data, index) => (
+                <div className="dataBorder" key={index}>
+                  {editIndex === index ? (
+                    <div className="editContainer">
+                      <TextField
+                        label="Edit Task"
+                        variant="outlined"
+                        value={editData}
+                        onChange={(e) => setEditData(e.target.value)}
+                      />
+                      <input
+                        type="date"
+                        value={editDate}
+                        onChange={(e) => setEditDate(e.target.value)}
+                      />
+                      <button
+                        onClick={() => handleEditTaskSubmit(data.id)}
+                        className="submitButton"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <p>{data.rand}</p>
+                      <p>Due: {data.date}</p>
+                      <IconButton onClick={() => handleDelete(data.id)}>
+                        <FaTrash />
+                      </IconButton>
+                      <button
+                        onClick={() => handleEdit(index, data)}
+                        className="submitButton"
+                      >
+                        Edit
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="textBox">
+              <TextField
+                label="Enter Task"
+                variant="outlined"
+                value={newData}
+                onChange={(e) => setNewData(e.target.value)}
+              />
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              />
+            </div>
+            <div className="submitDiv">
+              <button onClick={handleTextboxSubmit} className="submitButton">
+                Submit Task
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
